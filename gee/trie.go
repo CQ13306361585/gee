@@ -1,6 +1,9 @@
 package gee
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+)
 
 type node struct {
 	pattern  string  //待匹配路由
@@ -9,6 +12,9 @@ type node struct {
 	isWild   bool    //是否精确匹配 part 含有 : 或 * 时为true
 }
 
+func (n *node) String() string {
+	return fmt.Sprintf("node{pattern=%s,part=%s,isWild=%t}", n.pattern, n.part, n.isWild)
+}
 func (n *node) matchChild(part string) *node {
 	// 第一个匹配成功的节点，用于插入
 	for _, child := range n.children {
@@ -61,4 +67,13 @@ func (n *node) search(parts []string, height int) *node {
 		}
 	}
 	return nil
+}
+
+func (n *node) travel(list *[]*node) {
+	if n.pattern != "" {
+		*list = append(*list, n)
+	}
+	for _, child := range n.children {
+		child.travel(list)
+	}
 }
